@@ -21,11 +21,27 @@
 
 class Program
 {
+    // Reads the string and returns the integer
+    // E.g. "Monkey 0:" -> 0
     public static int ReadNum(string instruction)
     {
         int spaceIndex = instruction.IndexOf(' ');
         string monkeyNum = instruction.Substring(spaceIndex + 1, instruction.Length - spaceIndex - 2);
         return Convert.ToInt32(monkeyNum);
+    }
+    // Reads the string and returns queue of integers
+    // E.g. "Starting items: 54, 65, 75, 74" -> {54, 65, 75, 74}
+    public static Queue<int> ReadItems(string instruction)
+    {
+        Queue<int> items = new Queue<int>();
+
+        instruction = instruction.Replace("Starting items: ", "");
+        string[] nums = instruction.Split(", ");
+        foreach (string num in nums)
+        {
+            items.Enqueue(Convert.ToInt32(num));
+        }
+        return items;
     }
     public static List<Monkey> ParseMonkeys(string[] instructions)
     {
@@ -39,7 +55,9 @@ class Program
         {
             int monkeyIndex = 7 * i; // 6 lines plus a space per monkey
             int monkeyNum = ReadNum(instructions[monkeyIndex]);
-            Console.WriteLine(monkeyNum);
+            //Console.WriteLine(monkeyNum);
+            Queue<int> items = ReadItems(instructions[monkeyIndex + 1]);
+            
         }
         
         return monkeys;
