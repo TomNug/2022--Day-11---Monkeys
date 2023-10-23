@@ -2,16 +2,33 @@
 {
     private int inspectionCount;
     private Queue<int> itemQueue;
-    private string operation;
+    private string op;
+    private bool operandIsOwnVariable;
+    private int operand;
     private int testDivisbleBy;
     private int targetIfTrue;
     private int targetIfFalse;
-
+    private void CalculateOpAndOperand(string newOperation)
+    {
+        newOperation = newOperation.Replace("new = old ", "");
+        string[] operationAndOperand = newOperation.Split(" ");
+        // Operator is now first character
+        op = operationAndOperand[0];
+        if (operationAndOperand[1] == "old")
+        {
+            operandIsOwnVariable = true;
+        }
+        else
+        {
+            operandIsOwnVariable = false;
+            operand = Convert.ToInt32(operationAndOperand[1]);
+        }
+    }
     public Monkey(Queue<int> items, string newOperation, int div, int newTargetIfTrue, int newTargetIfFalse)
     {
         inspectionCount = 0;
         itemQueue = items;
-        operation = newOperation;
+        CalculateOpAndOperand(newOperation);
         testDivisbleBy = div;
         targetIfTrue = newTargetIfTrue;
         targetIfFalse = newTargetIfFalse;
@@ -43,12 +60,14 @@ class Program
         }
         return items;
     }
+
     // Reads the string operation from the string
     // E.g. "Operation: new = old + 6" -> "new = old + 6"
     public static string ReadOperation(string instruction)
     {
         return instruction.Replace("  Operation: ", "");
     }
+
     // Reads the integer divisor from the string
     // E.g. "  Test: divisible by 19" -> 19
     public static int ReadDivisibleBy(string instruction)
@@ -56,6 +75,7 @@ class Program
         instruction = instruction.Replace("  Test: divisible by ", "");
         return Convert.ToInt32(instruction);
     }
+
     // Reads the integer monkey target from the string
     // E.g. "    If true: throw to monkey 2" -> 2
     public static int ReadMonkeyIfTrue(string instruction)
@@ -63,6 +83,7 @@ class Program
         instruction = instruction.Replace("    If true: throw to monkey ", "");
         return Convert.ToInt32(instruction);
     }
+
     // Reads the integer monkey target from the string
     // E.g. "    If false: throw to monkey 0" -> 0
     public static int ReadMonkeyIfFalse(string instruction)
@@ -70,6 +91,7 @@ class Program
         instruction = instruction.Replace("    If false: throw to monkey ", "");
         return Convert.ToInt32(instruction);
     }
+
     public static List<Monkey> ParseMonkeys(string[] instructions)
     {
         List<Monkey> monkeys = new List<Monkey>();
@@ -85,13 +107,12 @@ class Program
             //Console.WriteLine(monkeyNum);
             Queue<int> items = ReadItems(instructions[monkeyIndex + 1]);
             string operation = ReadOperation(instructions[monkeyIndex + 2]);
-            Console.WriteLine(operation);
             int divisibleBy = ReadDivisibleBy(instructions[monkeyIndex + 3]);
-            Console.WriteLine(divisibleBy);
             int monkeyIfTrue = ReadMonkeyIfTrue(instructions[monkeyIndex + 4]);
-            Console.WriteLine(monkeyIfTrue);
             int monkeyIfFalse = ReadMonkeyIfFalse(instructions[monkeyIndex + 5]);
-            Console.WriteLine(monkeyIfFalse);
+
+            Monkey newMonkey = new Monkey(items, operation, divisibleBy, monkeyIfTrue, monkeyIfFalse);
+            monkeys.Add(newMonkey);
         }
         
         return monkeys;
