@@ -35,13 +35,26 @@ class Program
     {
         Queue<int> items = new Queue<int>();
 
-        instruction = instruction.Replace("Starting items: ", "");
+        instruction = instruction.Replace("  Starting items: ", "");
         string[] nums = instruction.Split(", ");
         foreach (string num in nums)
         {
             items.Enqueue(Convert.ToInt32(num));
         }
         return items;
+    }
+    // Reads the string operation from the string
+    // E.g. "Operation: new = old + 6" -> "new = old + 6"
+    public static string ReadOperation(string instruction)
+    {
+        return instruction.Replace("  Operation: ", "");
+    }
+    // Reads the integer divisor from the string
+    // E.g. "  Test: divisible by 19" -> 19
+    public static int ReadDivisibleBy(string instruction)
+    {
+        instruction = instruction.Replace("  Test: divisible by ", "");
+        return Convert.ToInt32(instruction);
     }
     public static List<Monkey> ParseMonkeys(string[] instructions)
     {
@@ -57,7 +70,10 @@ class Program
             int monkeyNum = ReadNum(instructions[monkeyIndex]);
             //Console.WriteLine(monkeyNum);
             Queue<int> items = ReadItems(instructions[monkeyIndex + 1]);
-            
+            string operation = ReadOperation(instructions[monkeyIndex + 2]);
+            Console.WriteLine(operation);
+            int divisibleBy = ReadDivisibleBy(instructions[monkeyIndex + 3]);
+            Console.WriteLine(divisibleBy);
         }
         
         return monkeys;
