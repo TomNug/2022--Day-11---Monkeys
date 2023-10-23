@@ -56,6 +56,20 @@ class Program
         instruction = instruction.Replace("  Test: divisible by ", "");
         return Convert.ToInt32(instruction);
     }
+    // Reads the integer monkey target from the string
+    // E.g. "    If true: throw to monkey 2" -> 2
+    public static int ReadMonkeyIfTrue(string instruction)
+    {
+        instruction = instruction.Replace("    If true: throw to monkey ", "");
+        return Convert.ToInt32(instruction);
+    }
+    // Reads the integer monkey target from the string
+    // E.g. "    If false: throw to monkey 0" -> 0
+    public static int ReadMonkeyIfFalse(string instruction)
+    {
+        instruction = instruction.Replace("    If false: throw to monkey ", "");
+        return Convert.ToInt32(instruction);
+    }
     public static List<Monkey> ParseMonkeys(string[] instructions)
     {
         List<Monkey> monkeys = new List<Monkey>();
@@ -74,6 +88,10 @@ class Program
             Console.WriteLine(operation);
             int divisibleBy = ReadDivisibleBy(instructions[monkeyIndex + 3]);
             Console.WriteLine(divisibleBy);
+            int monkeyIfTrue = ReadMonkeyIfTrue(instructions[monkeyIndex + 4]);
+            Console.WriteLine(monkeyIfTrue);
+            int monkeyIfFalse = ReadMonkeyIfFalse(instructions[monkeyIndex + 5]);
+            Console.WriteLine(monkeyIfFalse);
         }
         
         return monkeys;
