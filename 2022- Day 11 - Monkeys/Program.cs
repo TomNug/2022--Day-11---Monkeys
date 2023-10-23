@@ -1,4 +1,6 @@
-﻿class Monkey
+﻿using System.Text;
+
+class Monkey
 {
     private int inspectionCount;
     private Queue<int> itemQueue;
@@ -8,6 +10,8 @@
     private int testDivisbleBy;
     private int targetIfTrue;
     private int targetIfFalse;
+    // Reads a string, and determines the operator and operand
+    // E.g. Operation: new = old * 19
     private void CalculateOpAndOperand(string newOperation)
     {
         newOperation = newOperation.Replace("new = old ", "");
@@ -24,6 +28,8 @@
             operand = Convert.ToInt32(operationAndOperand[1]);
         }
     }
+    
+    // Constructor
     public Monkey(Queue<int> items, string newOperation, int div, int newTargetIfTrue, int newTargetIfFalse)
     {
         inspectionCount = 0;
@@ -32,6 +38,80 @@
         testDivisbleBy = div;
         targetIfTrue = newTargetIfTrue;
         targetIfFalse = newTargetIfFalse;
+    }
+
+    // Outputs the list of items
+    public void Output()
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (int item in itemQueue)
+        {
+            sb.Append(" ");
+            sb.Append(item.ToString());
+        }
+        Console.WriteLine(String.Format("Items: {0}", sb.ToString()));
+    }
+
+    // Received the given item, adds it to queue
+    private void ReceiveThrow(int item)
+    {
+        itemQueue.Enqueue(item);
+    }
+
+    // Returns inspection count
+    public int GetInspectionCount()
+    {
+        return inspectionCount;
+    }
+    
+    // Performs the operation on the given worry level
+    private int PerformOperation(int worryLevel)
+    {
+        if (operandIsOwnVariable)
+        {
+            operand = worryLevel;
+        }
+        if (op == "*")
+        {
+            return worryLevel * operand;
+        } else if (op == "/")
+        {
+            return worryLevel / operand;
+        } else if (op == "+")
+        {
+            return worryLevel + operand;
+        } else
+        {
+            return worryLevel - operand;
+        }
+    }
+
+    // One monkey's whole turn
+    public void TakeTurn(List<Monkey> monkeys)
+    {
+        // While queue has items
+        while (itemQueue.Count > 0)
+        {
+            // Inspect item
+            inspectionCount++;
+            int currentItem = itemQueue.Dequeue();
+            // Perform operation on item
+            int worryLevel = PerformOperation(currentItem);
+            // Divide worry by three
+            worryLevel = worryLevel / 3;
+            // Check divisibilit
+            if (worryLevel%testDivisbleBy == 0)
+            {
+                // Throw true
+                monkeys[targetIfTrue].ReceiveThrow(worryLevel);
+            }
+            else
+            {
+                // Throw false
+                monkeys[targetIfFalse].ReceiveThrow(worryLevel);
+            }
+        }
+
     }
 }
 
@@ -92,6 +172,19 @@ class Program
         return Convert.ToInt32(instruction);
     }
 
+    // Formatted output of monkeys
+    public static void OutputMonkeys(List<Monkey> monkeys)
+    {
+        for (int i = 0; i < monkeys.Count; i++)
+        {
+            Console.WriteLine("Monkey {0}", i);
+            monkeys[i].Output();
+        }
+    }
+
+    // Reads list of instructions
+    // Parses details
+    // Creates list of monkey objects using details
     public static List<Monkey> ParseMonkeys(string[] instructions)
     {
         List<Monkey> monkeys = new List<Monkey>();
@@ -117,6 +210,7 @@ class Program
         
         return monkeys;
     }
+
     public static void Main(string[] args)
     {
         string path = @"C:\Users\Tom\Documents\ASPNET Projects\2022- Day 11 - Monkeys\2022- Day 11 - Monkeys\data_test.txt";
@@ -124,5 +218,33 @@ class Program
         string[] instructions = System.IO.File.ReadAllLines(path);
 
         List<Monkey> monkeys = ParseMonkeys(instructions);
+
+        for (int round = 1; round <= 20; round++)
+        {
+            for (int i = 0; i < monkeys.Count(); i++)
+            {
+                monkeys[i].TakeTurn(monkeys);
+            }
+            Console.WriteLine(String.Format("\nAfter round {0}:", round));
+            OutputMonkeys(monkeys);
+        }
+
+        int inspectionFirstPlace = 0;
+        int inspectionSecondPlace = 0;
+        for (int i = 0; i < monkeys.Count(); i++)
+        {
+            int count = monkeys[i].GetInspectionCount();
+            if (count > inspectionFirstPlace)
+            {
+                inspectionSecondPlace = inspectionFirstPlace;
+                inspectionFirstPlace = count;
+            } 
+            else if (count > inspectionSecondPlace)
+            {
+                inspectionSecondPlace = count;
+            }
+        }
+        Console.WriteLine(String.Format("Total monkey business is: {0}", inspectionFirstPlace * inspectionSecondPlace));
+
     }
 }
