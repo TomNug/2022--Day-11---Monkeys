@@ -3,10 +3,10 @@
 class Monkey
 {
     private int inspectionCount;
-    private Queue<int> itemQueue;
+    private Queue<long> itemQueue;
     private string op;
     private bool operandIsOwnVariable;
-    private int operand;
+    private long operand;
     private int testDivisbleBy;
     private int targetIfTrue;
     private int targetIfFalse;
@@ -30,7 +30,7 @@ class Monkey
     }
     
     // Constructor
-    public Monkey(Queue<int> items, string newOperation, int div, int newTargetIfTrue, int newTargetIfFalse)
+    public Monkey(Queue<long> items, string newOperation, int div, int newTargetIfTrue, int newTargetIfFalse)
     {
         inspectionCount = 0;
         itemQueue = items;
@@ -53,7 +53,7 @@ class Monkey
     }
 
     // Received the given item, adds it to queue
-    private void ReceiveThrow(int item)
+    private void ReceiveThrow(long item)
     {
         itemQueue.Enqueue(item);
     }
@@ -65,7 +65,7 @@ class Monkey
     }
     
     // Performs the operation on the given worry level
-    private int PerformOperation(int worryLevel)
+    private long PerformOperation(long worryLevel)
     {
         if (operandIsOwnVariable)
         {
@@ -94,9 +94,9 @@ class Monkey
         {
             // Inspect item
             inspectionCount++;
-            int currentItem = itemQueue.Dequeue();
+            long currentItem = itemQueue.Dequeue();
             // Perform operation on item
-            int worryLevel = PerformOperation(currentItem);
+            long worryLevel = PerformOperation(currentItem);
             // Divide worry by three
             worryLevel = worryLevel / 3;
             // Check divisibilit
@@ -126,17 +126,18 @@ class Program
         string monkeyNum = instruction.Substring(spaceIndex + 1, instruction.Length - spaceIndex - 2);
         return Convert.ToInt32(monkeyNum);
     }
+
     // Reads the string and returns queue of integers
     // E.g. "Starting items: 54, 65, 75, 74" -> {54, 65, 75, 74}
-    public static Queue<int> ReadItems(string instruction)
+    public static Queue<long> ReadItems(string instruction)
     {
-        Queue<int> items = new Queue<int>();
+        Queue<long> items = new Queue<long>();
 
         instruction = instruction.Replace("  Starting items: ", "");
         string[] nums = instruction.Split(", ");
         foreach (string num in nums)
         {
-            items.Enqueue(Convert.ToInt32(num));
+            items.Enqueue(long.Parse(num));
         }
         return items;
     }
@@ -198,7 +199,7 @@ class Program
             int monkeyIndex = 7 * i; // 6 lines plus a space per monkey
             int monkeyNum = ReadNum(instructions[monkeyIndex]);
             //Console.WriteLine(monkeyNum);
-            Queue<int> items = ReadItems(instructions[monkeyIndex + 1]);
+            Queue<long> items = ReadItems(instructions[monkeyIndex + 1]);
             string operation = ReadOperation(instructions[monkeyIndex + 2]);
             int divisibleBy = ReadDivisibleBy(instructions[monkeyIndex + 3]);
             int monkeyIfTrue = ReadMonkeyIfTrue(instructions[monkeyIndex + 4]);
@@ -213,9 +214,10 @@ class Program
 
     public static void Main(string[] args)
     {
-        string path = @"C:\Users\Tom\Documents\ASPNET Projects\2022- Day 11 - Monkeys\2022- Day 11 - Monkeys\data_test.txt";
+        string pathTest = @"C:\Users\Tom\Documents\ASPNET Projects\2022- Day 11 - Monkeys\2022- Day 11 - Monkeys\data_test.txt";
+        string pathFull = @"C:\Users\Tom\Documents\ASPNET Projects\2022- Day 11 - Monkeys\2022- Day 11 - Monkeys\data_full.txt";
 
-        string[] instructions = System.IO.File.ReadAllLines(path);
+        string[] instructions = System.IO.File.ReadAllLines(pathFull);
 
         List<Monkey> monkeys = ParseMonkeys(instructions);
 
@@ -224,6 +226,7 @@ class Program
             for (int i = 0; i < monkeys.Count(); i++)
             {
                 monkeys[i].TakeTurn(monkeys);
+                Console.WriteLine(String.Format("Monkey {0} has a count of {1}", i, monkeys[i].GetInspectionCount()));
             }
             Console.WriteLine(String.Format("\nAfter round {0}:", round));
             OutputMonkeys(monkeys);
@@ -243,8 +246,14 @@ class Program
             {
                 inspectionSecondPlace = count;
             }
+            //Console.WriteLine(String.Format("End of round {0}", i + 1));
+
         }
         Console.WriteLine(String.Format("Total monkey business is: {0}", inspectionFirstPlace * inspectionSecondPlace));
 
     }
 }
+
+// No errors, calculates the monkey business
+// Appears to read in all data correctly
+// Unsure of how to proceed and debug
