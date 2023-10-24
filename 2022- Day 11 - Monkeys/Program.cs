@@ -10,6 +10,7 @@ class Monkey
     private int testDivisbleBy;
     private int targetIfTrue;
     private int targetIfFalse;
+    private int lcm;
     // Reads a string, and determines the operator and operand
     // E.g. Operation: new = old * 19
     private void CalculateOpAndOperand(string newOperation)
@@ -64,6 +65,15 @@ class Monkey
         return inspectionCount;
     }
     
+    public int GetDivisibleFactor()
+    {
+        return testDivisbleBy;
+    }
+
+    public void SetLCM(int newLCM)
+    {
+        lcm = newLCM;
+    }
     // Performs the operation on the given worry level
     private long PerformOperation(long worryLevel)
     {
@@ -98,7 +108,7 @@ class Monkey
             // Perform operation on item
             long worryLevel = PerformOperation(currentItem);
             // Divide worry by three
-            worryLevel = worryLevel / 3;
+            worryLevel = worryLevel % (long)lcm; // 3;
             // Check divisibilit
             if (worryLevel%testDivisbleBy == 0)
             {
@@ -212,6 +222,19 @@ class Program
         return monkeys;
     }
 
+    public static void CalculateAndSetLCM(List<Monkey> monkeys)
+    {
+        int lcm = 1;
+        foreach(Monkey monkey in monkeys)
+        {
+            lcm *= monkey.GetDivisibleFactor();
+        }
+        foreach (Monkey monkey in monkeys)
+        {
+            monkey.SetLCM(lcm);
+        }
+    }
+
     public static void Main(string[] args)
     {
         string pathTest = @"C:\Users\Tom\Documents\ASPNET Projects\2022- Day 11 - Monkeys\2022- Day 11 - Monkeys\data_test.txt";
@@ -221,15 +244,18 @@ class Program
 
         List<Monkey> monkeys = ParseMonkeys(instructions);
 
-        for (int round = 1; round <= 20; round++)
+        CalculateAndSetLCM(monkeys);
+
+        for (int round = 1; round <= 10000; round++)
         {
+            //Console.WriteLine(String.Format("\nAfter round {0}:", round));
             for (int i = 0; i < monkeys.Count(); i++)
             {
                 monkeys[i].TakeTurn(monkeys);
-                Console.WriteLine(String.Format("Monkey {0} has a count of {1}", i, monkeys[i].GetInspectionCount()));
+                //Console.WriteLine(String.Format("Monkey {0} has a count of {1}", i, monkeys[i].GetInspectionCount()));
             }
-            Console.WriteLine(String.Format("\nAfter round {0}:", round));
-            OutputMonkeys(monkeys);
+            
+            //OutputMonkeys(monkeys);
         }
 
         int inspectionFirstPlace = 0;
@@ -249,7 +275,8 @@ class Program
             //Console.WriteLine(String.Format("End of round {0}", i + 1));
 
         }
-        Console.WriteLine(String.Format("Total monkey business is: {0}", inspectionFirstPlace * inspectionSecondPlace));
+        long monkeyBusiness = (long)inspectionFirstPlace * (long)inspectionSecondPlace;
+        Console.WriteLine(String.Format("Total monkey business is: {0}", monkeyBusiness));
 
     }
 }
